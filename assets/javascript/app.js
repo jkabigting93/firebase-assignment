@@ -15,6 +15,7 @@ var firebaseConfig = {
   var destination = "";
   var firstTrainTime = "";
   var frequency = "";
+  var nextArrival = 
 
   $("button").on("click", function() {
       name = $("#trainNameInput").val().trim();
@@ -31,5 +32,8 @@ var firebaseConfig = {
   })
 
   firebase.database().ref().on("value", function(snapshot){
+      var newEntryRow = $("<tr>");
+      var rowContent = "<td>" + name + "</td><td>" + destination + "</td><td>" + frequency + "</td><td>" + nextArrival + "</td><td>" + minutesAway + "</td>";
+
       console.log(snapshot.val());
   })
