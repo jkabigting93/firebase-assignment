@@ -14,15 +14,15 @@ $(document).ready(function() {
     };
 
     firebase.initializeApp(firebaseConfig);
-    var database = firebase.database;
+    var database = firebase.database();
 
-    // Declare empty variables for user input
+// Declare empty variables for user input
     var name = "";
     var destination = "";
     var firstTrainTime = "";
     var frequency = "";
 
-    // Added click listener to grab user input and send to firebase
+// Added click listener to grab user input and send to firebase
     $("button").on("click", function() {
         name = $("#trainNameInput").val().trim();
         destination = $("#destinationInput").val().trim();
@@ -34,11 +34,11 @@ $(document).ready(function() {
             destination:destination,
             firstTrainTime:firstTrainTime,
             frequency:frequency
-        })
-    })
+        });
+    });
 
-    // Calculations to determine calculated variables (next arrival and minutes away) using moment.js
-    firebase.database.ref().on("child_added", function(childSnapshot) {
+// Calculations to determine calculated variables (next arrival and minutes away) using moment.js
+    database.ref().on("child_added", function(childSnapshot) {
         var nextArrival = "";
         var minutesAway = "";
         var firstTrainTimeLastYear = moment(childSnapshot.val().firstTrainTime, "hh:mm").subtract(1, "years");
@@ -48,7 +48,7 @@ $(document).ready(function() {
         var nextArrival = moment().add(minutesAway, "minutes");
         nextArrival = moment(nextArrival).format("hh:mm");
 
-    // Appending new entries to table
+// Appending new entries to table
         $("tbody").append("<tr><td>" + childSnapshot.val().name + "</td><td>" + destination + "</td><td>" + frequency + "</td><td>" + nextArrival + "</td><td>" + minutesAway + "</td></tr>");
     }, function(err) {
         console.log("Error: " + err.code);
