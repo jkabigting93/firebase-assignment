@@ -34,13 +34,16 @@ $("button").on("click", function() {
 })
 
 // Calculations to determine calculated variables (next arrival and minutes away) using moment.js
-var now = moment();
-var trainTime = moment.unix(firstTrainTime).format("hh:mm");
-var difference = moment().diff(moment(trainTime), "minutes");
-var remainder = difference % frequency;
-var minutesAway = frequency-remainder;
-var nextArrival = moment().add(minutesAway, "minutes").format("hh:mm)");
-console.log("Current Time: " + moment(currentTime).format("hh:mm"));
+database.ref().on("child_added", function(childSnapshot) {
+    var nextArrival = "";
+    var minutesAway = "";
+    var firstTrainTimeLastYear = moment(childSnapshot.val().firstTrainTime, "hh:mm").subtract(1, "years");
+    var timeDifference = moment().diff(moment(firstTrainTimeLastYear), "minutes");
+    var remainingTime = timeDifference % childSnapshot.val().frequency;
+    var minutesAway = childSnapshot.val().frequency - remainingTime;
+    var nextArrival = moment().add(minutesAway, "minutes");
+    nextArrival = moment(nextArrival).format("hh:mm");
+})
 
 // Appending new entries to table
 firebase.database().ref().on("value", function(snapshot){
