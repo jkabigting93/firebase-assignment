@@ -43,12 +43,12 @@ database.ref().on("child_added", function(childSnapshot) {
     var minutesAway = childSnapshot.val().frequency - remainingTime;
     var nextArrival = moment().add(minutesAway, "minutes");
     nextArrival = moment(nextArrival).format("hh:mm");
-})
 
 // Appending new entries to table
-firebase.database().ref().on("value", function(snapshot){
-    var newEntryRow = $("<tr>");
-    var rowContent = "<td>" + name + "</td><td>" + destination + "</td><td>" + frequency + "</td><td>" + nextArrival + "</td><td>" + minutesAway + "</td>";
-
-    console.log(snapshot.val());
+    firebase.database().ref().on("value", function(snapshot){
+        var newEntryRow = $("<tr>");
+        var rowContent = "<td>" + name + "</td><td>" + destination + "</td><td>" + frequency + "</td><td>" + nextArrival + "</td><td>" + minutesAway + "</td>";
+    
+        console.log(snapshot.val());
+    })
 })
