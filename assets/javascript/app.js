@@ -1,3 +1,4 @@
+// Initialize Firebase
 var firebaseConfig = {
     apiKey: "AIzaSyDQJ27gQO_jJW-FUJbvkfIpeQ9WX9tjFM8",
     authDomain: "fir-assignment-2019.firebaseapp.com",
@@ -7,33 +8,44 @@ var firebaseConfig = {
     messagingSenderId: "1077675087519",
     appId: "1:1077675087519:web:1f5dfc0c19fd31d9afb4aa",
     measurementId: "G-BPCTSBW4LB"
-  };
+};
 
-  firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 
-  var name = "";
-  var destination = "";
-  var firstTrainTime = "";
-  var frequency = "";
-  var nextArrival = 
+// Declare empty variables for user input
+var name = "";
+var destination = "";
+var firstTrainTime = "";
+var frequency = "";
 
-  $("button").on("click", function() {
-      name = $("#trainNameInput").val().trim();
-      destination = $("#destinationInput").val().trim();
-      firstTrainTime = $("#firstTrainTimeInput").val().trim();
-      frequency = $("#frequencyInput").val().trim();
+// Added click listener to grab user input and send to firebase
+$("button").on("click", function() {
+    name = $("#trainNameInput").val().trim();
+    destination = $("#destinationInput").val().trim();
+    firstTrainTime = moment($("#firstTrainTimeInput").val().trim(), "hh:mm").subtract(1, "years").format("X");
+    frequency = $("#frequencyInput").val().trim();
 
-      firebase.database().ref().set({
-          name:name,
-          destination:destination,
-          firstTrainTime:firstTrainTime,
-          frequency:frequency
-      })
-  })
+    firebase.database().ref().set({
+        name:name,
+        destination:destination,
+        firstTrainTime:firstTrainTime,
+        frequency:frequency
+    })
+})
 
-  firebase.database().ref().on("value", function(snapshot){
-      var newEntryRow = $("<tr>");
-      var rowContent = "<td>" + name + "</td><td>" + destination + "</td><td>" + frequency + "</td><td>" + nextArrival + "</td><td>" + minutesAway + "</td>";
+// Calculations to determine calculated variables (next arrival and minutes away) using moment.js
+var now = moment();
+var trainTime = moment.unix(firstTrainTime).format("hh:mm");
+var difference = moment().diff(moment(trainTime), "minutes");
+var remainder = difference % frequency;
+var minutesAway = frequency-remainder;
+var nextArrival = moment().add(minutesAway, "minutes").format("hh:mm)");
+console.log("Current Time: " + moment(currentTime).format("hh:mm"));
 
-      console.log(snapshot.val());
-  })
+// Appending new entries to table
+firebase.database().ref().on("value", function(snapshot){
+    var newEntryRow = $("<tr>");
+    var rowContent = "<td>" + name + "</td><td>" + destination + "</td><td>" + frequency + "</td><td>" + nextArrival + "</td><td>" + minutesAway + "</td>";
+
+    console.log(snapshot.val());
+})
