@@ -24,9 +24,10 @@ $(document).ready(function() {
 
 // Added click listener to grab user input and send to firebase
     $("button").on("click", function() {
+        event.preventDefault();
         name = $("#trainNameInput").val().trim();
         destination = $("#destinationInput").val().trim();
-        firstTrainTime = moment($("#firstTrainTimeInput").val().trim(), "hh:mm").subtract(1, "years").format("X");
+        firstTrainTime = $("#firstTrainTimeInput").val().trim();
         frequency = $("#frequencyInput").val().trim();
 
         firebase.database().ref().push({
@@ -40,14 +41,14 @@ $(document).ready(function() {
 
 // Calculations to determine calculated variables (next arrival and minutes away) using moment.js
     database.ref().on("child_added", function(childSnapshot) {
-        var nextArrival = "";
-        var minutesAway = "";
+        var nextArrival;
+        var minutesAway;
         var firstTrainTimeLastYear = moment(childSnapshot.val().firstTrainTime, "hh:mm").subtract(1, "years");
         var timeDifference = moment().diff(moment(firstTrainTimeLastYear), "minutes");
         var remainingTime = timeDifference % childSnapshot.val().frequency;
         var minutesAway = childSnapshot.val().frequency - remainingTime;
         var nextArrival = moment().add(minutesAway, "minutes");
-        nextArrival = moment(nextArrival).format("hh:mm");
+        var nextArrival = moment(nextArrival).format("hh:mm");
 
 // Appending new entries to table
         $("tbody").append("<tr><td id='nameDisplay'>" + childSnapshot.val().name + "</td><td id='destinationDisplay'>" + childSnapshot.val().destination + "</td><td id='frequencyDisplay'>" + childSnapshot.val().frequency + "</td><td id='nextArrivalDisplay'>" + nextArrival + "</td><td>" + minutesAway + "</td id='minutesAwayDisplay'></tr>");
@@ -55,9 +56,9 @@ $(document).ready(function() {
         console.log("Error: " + err.code);
     });
 
-    database.ref().orderByChild("dateAdded").limitToLast(1).on("child_added", function(childSnapshot) {
-        $("#nameDisplay").html(childSnapshot.val().name);
-        $("#destinationDisplay").html(childSnapshot.val().destination);
-        $("#frequencyDisplay").html(childSnapshot.val().frequency);
+    database.ref().orderByChild("dateAdded").limitToLast(1).on("child_added", function(snapshot) {
+        $("#nameDisplay").html(snapshot.val().name);
+        $("#destinationDisplay").html(snapshot.val().destination);
+        $("#frequencyDisplay").html(snapshot.val().frequency);
     });
 });
