@@ -29,11 +29,12 @@ $(document).ready(function() {
         firstTrainTime = moment($("#firstTrainTimeInput").val().trim(), "hh:mm").subtract(1, "years").format("X");
         frequency = $("#frequencyInput").val().trim();
 
-        firebase.database().ref().set({
+        firebase.database().ref().push({
             name:name,
             destination:destination,
             firstTrainTime:firstTrainTime,
-            frequency:frequency
+            frequency:frequency,
+            dateAdded:firebase.database.ServerValue.TIMESTAMP
         });
     });
 
@@ -49,8 +50,14 @@ $(document).ready(function() {
         nextArrival = moment(nextArrival).format("hh:mm");
 
 // Appending new entries to table
-        $("tbody").append("<tr><td>" + childSnapshot.val().name + "</td><td>" + destination + "</td><td>" + frequency + "</td><td>" + nextArrival + "</td><td>" + minutesAway + "</td></tr>");
+        $("tbody").append("<tr><td id='nameDisplay'>" + childSnapshot.val().name + "</td><td id='destinationDisplay'>" + childSnapshot.val().destination + "</td><td id='frequencyDisplay'>" + childSnapshot.val().frequency + "</td><td id='nextArrivalDisplay'>" + nextArrival + "</td><td>" + minutesAway + "</td id='minutesAwayDisplay'></tr>");
     }, function(err) {
         console.log("Error: " + err.code);
+    });
+
+    database.ref().orderByChild("dateAdded").limitToLast(1).on("child_added", function(childSnapshot) {
+        $("#nameDisplay").html(childSnapshot.val().name);
+        $("#destinationDisplay").html(childSnapshot.val().destination);
+        $("#frequencyDisplay").html(childSnapshot.val().frequency);
     });
 });
